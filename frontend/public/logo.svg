@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none">
+  <defs>
+    <linearGradient id="brandGrad" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563EB" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer Rounded Square container -->
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#brandGrad)" />
+  <rect x="2.5" y="2.5" width="43" height="43" rx="11.5" stroke="#93C5FD" stroke-opacity="0.3" stroke-width="1" />
+  
+  <!-- Briefcase Handle -->
+  <path d="M18 15V13C18 11.8954 18.8954 11 20 11H28C29.1046 11 30 11.8954 30 13V15" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Briefcase Body -->
+  <rect x="10" y="15" width="28" height="20" rx="4" fill="white" fill-opacity="0.15" stroke="white" stroke-width="2.5" />
+  
+  <!-- Central Pulse / Current Energy Wave -->
+  <path d="M10 24H18L21 19L27 29L30 24H38" stroke="#93C5FD" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
