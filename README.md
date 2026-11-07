@@ -12,47 +12,27 @@ JobCurrent is an AI-assisted job and internship discovery platform that aggregat
 job-current/
 │
 ├── frontend/                           # React + Vite + Tailwind CSS Application
-│   ├── public/                         # Static assets (logo.svg, favicon, robots.txt)
-│   └── src/                            # Source code (JavaScript ES6+, JSX)
-│       ├── assets/                     # Static images, SVG illustrations, brand badges
-│       ├── components/                 # Reusable UI component library
-│       │   ├── admin/                  # Admin dashboard widgets, metrics, source toggles
-│       │   ├── common/                 # Design system primitives (Button, Badge, Modal, Input, Skeleton)
-│       │   ├── dashboard/              # User dashboard cards, profile completion, recommendations
-│       │   ├── jobs/                   # Job cards, multi-faceted filter bar, search, job details
-│       │   ├── layout/                 # Navbar, Footer, PageContainer
-│       │   └── tracker/                # Application tracking Kanban board & status updater
-│       ├── context/                    # React Contexts (AuthContext, ThemeContext)
-│       ├── data/                       # Mock/demo seed data, filter options, domain catalogs
-│       ├── hooks/                      # Custom React hooks (useJobs, useSavedJobs, useDebounce)
-│       ├── layouts/                    # App layouts (RootLayout, DashboardLayout, AdminLayout)
-│       ├── lib/                        # Utility helpers (cn, formatters, Supabase client instance)
-│       ├── pages/                      # Application route views
-│       │   ├── admin/                  # Admin overview, source health, collection audit logs
-│       │   ├── auth/                   # Login, Register, Forgot Password, Email Verification
-│       │   ├── dashboard/              # Personalized Dashboard, Profile & Academics, Preferences, Tracker
-│       │   └── public/                 # Landing Page, Public Job Discovery, Individual Job Details
-│       ├── services/                   # Frontend API services and data fetchers
-│       └── styles/                     # Global CSS & Tailwind styling setup
+│   ├── public/                         # Static assets (logo.svg, favicon)
+│   └── src/                            # JavaScript ES6+, JSX
+│       ├── components/                 # Reusable UI component library (Design system)
+│       ├── context/                    # AuthContext, ThemeContext (Light & Dark)
+│       ├── pages/                      # LandingPage, BrowseJobs, JobDetails, Dashboard, Tracker
+│       ├── data/                       # Verified mock seed listings
+│       └── lib/                        # Formatting, Supabase client
 │
-├── backend/                            # Supabase, Connectors, AI & Automation Services
-│   ├── connectors/                     # Modular job source connector architecture
-│   │   ├── base/                       # Base connector interface & abstract class
-│   │   └── sources/                    # Concrete connectors (Arbeitnow, RemoteOK, Internshala, LinkedIn, etc.)
-│   ├── scripts/                        # Manual collection triggers & seeding utilities
-│   ├── services/                       # Core backend business logic
-│   │   ├── ai/                         # Groq structured extraction logic & prompts
-│   │   ├── email/                      # Resend HTML email templates & delivery logic
-│   │   ├── matching/                   # Eligibility checking & match scoring engine
-│   │   └── normalization/              # Job deduplication, URL normalization, description hashing
-│   └── supabase/                       # Supabase configuration
-│       ├── functions/                  # Supabase Edge Functions (Deno / TS or JS)
-│       │   ├── collect-jobs/           # Scheduled multi-source job fetcher
-│       │   ├── extract-ai/             # Groq AI structured data extraction worker
-│       │   ├── match-engine/           # Personalized user-to-job matching worker
-│       │   └── send-digest/            # Resend daily digest notification dispatcher
-│       ├── migrations/                 # PostgreSQL migrations (Tables, RLS, Triggers, Indexes)
-│       └── seeds/                      # Seed data fixtures and default sources
+├── backend/                            # FastAPI (Python 3.10+) Backend Application
+│   ├── app/
+│   │   ├── main.py                     # FastAPI application with CORS & OpenAPI docs
+│   │   ├── config.py                   # Pydantic BaseSettings
+│   │   ├── api/v1/                     # REST routes: jobs, match, collector, extract, digest
+│   │   ├── models/schemas.py           # Pydantic v2 schemas
+│   │   ├── services/                   # Normalization, MatchingEngine, GroqService, EmailService
+│   │   └── connectors/                 # Jobvetta, Himalayas, Arbeitnow, RemoteOK, Greenhouse, Lever
+│   ├── tests/                          # Automated Pytest suite (17 passed)
+│   ├── scripts/                        # Ingestion runners
+│   ├── pyproject.toml                  # Python dependencies
+│   ├── requirements.txt                # Pinned pip requirements
+│   └── run.py                          # Local server launcher
 │
 ├── docs/                               # System architecture, database schema, deployment guides
 ├── .env.example                        # Root environment variable template
@@ -65,9 +45,9 @@ job-current/
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | React 18 (JavaScript ES6+, JSX), Vite, React Router DOM |
-| **Styling** | Tailwind CSS (Minimalist SaaS design inspired by Linear & Notion), Lucide Icons |
-| **Backend & DB** | Supabase (PostgreSQL, Row Level Security, Auth, Storage, Edge Functions, Cron) |
-| **AI Extraction** | Groq API (Structured JSON extraction) |
-| **Email Service** | Resend API (Responsive HTML daily digest templates) |
-| **Deployment** | Vercel (Frontend) + Supabase Cloud (Backend) |
+| **Frontend** | React 18 (JavaScript ES6+, JSX), Vite, React Router DOM, Tailwind CSS, Lucide Icons |
+| **Backend API** | **FastAPI (Python 3.10+)**, Uvicorn, Pydantic v2, HTTPX |
+| **Database & Auth** | Supabase (PostgreSQL with Row Level Security, Supabase Auth) |
+| **AI Extraction** | Groq API (`llama-3.3-70b-versatile` JSON mode + deterministic parsing fallback) |
+| **Email Service** | Resend API (Personalized responsive HTML daily digests) |
+| **Package Managers** | `uv` / `pip` for Python; `npm` for React |

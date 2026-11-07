@@ -20,11 +20,12 @@ import { Badge } from '../../components/common/Badge';
 
 export function AdminDashboardPage() {
   const [sources, setSources] = useState([
-    { id: 'src-01', name: 'Arbeitnow API', type: 'REST API', enabled: true, jobsFound: 1420, lastRun: '15m ago', status: 'healthy' },
-    { id: 'src-02', name: 'RemoteOK API', type: 'REST API', enabled: true, jobsFound: 890, lastRun: '30m ago', status: 'healthy' },
-    { id: 'src-03', name: 'Company Portals (Greenhouse/Lever RSS)', type: 'RSS Feed', enabled: true, jobsFound: 2150, lastRun: '1h ago', status: 'healthy' },
-    { id: 'src-04', name: 'Internshala Connector', type: 'Scheduled Sync', enabled: false, jobsFound: 0, lastRun: 'Never', status: 'credential_required' },
-    { id: 'src-05', name: 'LinkedIn Permitted Feeds', type: 'OAuth API', enabled: false, jobsFound: 0, lastRun: 'Never', status: 'auth_required' },
+    { id: 'src-01', name: 'Jobvetta API', market: 'India', type: 'REST API', enabled: true, jobsFound: 1850, lastRun: '10m ago', status: 'healthy' },
+    { id: 'src-02', name: 'Himalayas API', market: 'International Remote', type: 'REST API', enabled: true, jobsFound: 920, lastRun: '20m ago', status: 'healthy' },
+    { id: 'src-03', name: 'Arbeitnow API', market: 'International', type: 'REST API', enabled: true, jobsFound: 1420, lastRun: '15m ago', status: 'healthy' },
+    { id: 'src-04', name: 'RemoteOK API', market: 'Global Remote', type: 'REST API', enabled: true, jobsFound: 890, lastRun: '30m ago', status: 'healthy' },
+    { id: 'src-05', name: 'Greenhouse Direct API', market: 'Direct Company', type: 'Job Board API', enabled: true, jobsFound: 2450, lastRun: '45m ago', status: 'healthy' },
+    { id: 'src-06', name: 'Lever Direct API', market: 'Direct Company', type: 'Postings API', enabled: true, jobsFound: 1680, lastRun: '50m ago', status: 'healthy' },
   ]);
 
   const [collecting, setCollecting] = useState(false);

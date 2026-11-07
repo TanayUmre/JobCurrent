@@ -71,20 +71,24 @@ export function Footer() {
             </h4>
             <ul className="space-y-2 text-xs">
               <li className="flex items-center justify-between text-slate-500">
-                <span>Arbeitnow API</span>
+                <span>Jobvetta (India)</span>
                 <span className="text-[10px] text-emerald-600 font-medium">Verified Active</span>
               </li>
               <li className="flex items-center justify-between text-slate-500">
-                <span>RemoteOK API</span>
+                <span>Himalayas (Remote)</span>
                 <span className="text-[10px] text-emerald-600 font-medium">Verified Active</span>
               </li>
               <li className="flex items-center justify-between text-slate-500">
-                <span>Company Career Portals</span>
-                <span className="text-[10px] text-emerald-600 font-medium">Direct RSS</span>
+                <span>Arbeitnow (Global)</span>
+                <span className="text-[10px] text-emerald-600 font-medium">Verified Active</span>
               </li>
               <li className="flex items-center justify-between text-slate-500">
-                <span>Internshala / LinkedIn</span>
-                <span className="text-[10px] text-slate-400 font-mono">Permitted Sync</span>
+                <span>RemoteOK (Remote)</span>
+                <span className="text-[10px] text-emerald-600 font-medium">Verified Active</span>
+              </li>
+              <li className="flex items-center justify-between text-slate-500">
+                <span>Greenhouse & Lever</span>
+                <span className="text-[10px] text-emerald-600 font-medium">Direct Company</span>
               </li>
             </ul>
           </div>

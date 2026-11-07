@@ -1,0 +1,1 @@
+"""JobCurrent FastAPI Application Package"""
