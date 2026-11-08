@@ -155,6 +155,21 @@ CREATE TABLE IF NOT EXISTS public.notification_queue (
 );
 
 -- --------------------------------------------------------------------
+-- 8B. IN-APP NOTIFICATIONS & ALERTS TABLE
+-- --------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.notifications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    type VARCHAR(50) DEFAULT 'match', -- 'match', 'deadline', 'application', 'system'
+    job_id UUID REFERENCES public.jobs(id) ON DELETE SET NULL,
+    data JSONB DEFAULT '{}'::jsonb,
+    is_read BOOLEAN DEFAULT false NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- --------------------------------------------------------------------
 -- 9. JOB SOURCES TABLE
 -- --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.job_sources (
@@ -215,6 +230,7 @@ CREATE INDEX IF NOT EXISTS idx_jobs_extraction_status ON public.jobs (extraction
 CREATE INDEX IF NOT EXISTS idx_job_matches_user_score ON public.job_matches (user_id, match_score DESC);
 CREATE INDEX IF NOT EXISTS idx_saved_jobs_user ON public.saved_jobs (user_id);
 CREATE INDEX IF NOT EXISTS idx_applications_user ON public.applications (user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_read ON public.notifications (user_id, is_read, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_notif_queue_status_sched ON public.notification_queue (status, scheduled_at);
 CREATE INDEX IF NOT EXISTS idx_email_logs_user_job ON public.email_logs (user_id, job_id);
 
@@ -229,6 +245,7 @@ ALTER TABLE public.saved_jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.email_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notification_queue ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.job_sources ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.collection_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
@@ -277,6 +294,16 @@ CREATE POLICY "Users read own matches" ON public.job_matches
 -- EMAIL LOGS
 CREATE POLICY "Users read own email logs" ON public.email_logs
     FOR SELECT USING (auth.uid() = user_id);
+
+-- NOTIFICATIONS (IN-APP)
+CREATE POLICY "Users view own notifications" ON public.notifications
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users update own notifications" ON public.notifications
+    FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users delete own notifications" ON public.notifications
+    FOR DELETE USING (auth.uid() = user_id);
 
 -- NOTIFICATION QUEUE
 CREATE POLICY "Admins manage notification queue" ON public.notification_queue

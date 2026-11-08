@@ -2,6 +2,7 @@ from app.main import root
 from app.api.v1.jobs import list_jobs, get_job_by_id
 from app.api.v1.matching import evaluate_match
 from app.api.v1.collector import get_collector_status
+from app.api.v1.notifications import get_notifications, mark_notification_read, mark_all_notifications_read
 from app.models.schemas import MatchEvaluationRequest, JobBase, CandidateProfile
 
 
@@ -52,3 +53,16 @@ def test_collector_status_endpoint():
     res = get_collector_status()
     assert res["status"] == "operational"
     assert len(res["active_connectors"]) >= 2
+
+
+def test_in_app_notifications_endpoints():
+    res = get_notifications(user_id="usr-demo-001")
+    assert "notifications" in res
+    assert len(res["notifications"]) >= 1
+    assert res["unread_count"] >= 0
+
+    read_res = mark_notification_read(res["notifications"][0]["id"])
+    assert read_res["success"] is True
+
+    all_read = mark_all_notifications_read()
+    assert all_read["success"] is True

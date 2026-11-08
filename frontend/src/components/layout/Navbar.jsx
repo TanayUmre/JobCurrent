@@ -18,6 +18,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Button } from '../common/Button';
+import { NotificationBell } from '../notifications/NotificationBell';
 
 export function Navbar() {
   const { user, profile, logout, loginAsDemo } = useAuth();
@@ -104,6 +105,9 @@ export function Navbar() {
           >
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
+
+          {/* In-App Notifications Bell for Authenticated Users */}
+          {user && <NotificationBell />}
 
           {user ? (
             <div className="relative">
@@ -215,7 +219,8 @@ export function Navbar() {
         </div>
 
         {/* Mobile menu trigger */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-1.5 md:hidden">
+          {user && <NotificationBell />}
           <button
             onClick={toggleTheme}
             className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"

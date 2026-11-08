@@ -33,11 +33,51 @@ const DEFAULT_PREFERENCES = {
   minimum_stipend: 35000,
   paid_only: true,
   include_unknown_eligibility: true,
-  email_enabled: true,
+  in_app_notifications_enabled: true,
+  email_enabled: false,
   notification_frequency: 'daily',
   notification_time: '08:00:00',
   timezone: 'Asia/Kolkata',
 };
+
+const DEFAULT_NOTIFICATIONS = [
+  {
+    id: 'notif-001',
+    title: '🎯 94% Match: SDE Backend at Swiggy',
+    message: 'New role in Bengaluru matching your Python, PostgreSQL, and 2026 Batch preferences.',
+    type: 'match',
+    job_id: 'job-001',
+    is_read: false,
+    created_at: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'notif-002',
+    title: '⚡ High Eligibility: Frontend Intern at Razorpay',
+    message: 'Your 8.4 CGPA meets all criteria. ₹45,000/mo stipend in Bengaluru (Hybrid).',
+    type: 'match',
+    job_id: 'job-002',
+    is_read: false,
+    created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'notif-003',
+    title: '⏰ Application Deadline Reminder',
+    message: 'Software Engineer role at GitLab application window closes in 48 hours.',
+    type: 'deadline',
+    job_id: 'job-003',
+    is_read: true,
+    created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'notif-004',
+    title: '🔔 In-App Daily Alerts Activated',
+    message: 'Zero spam, zero email setup required. All fresh job matches now arrive directly in your in-app notification center.',
+    type: 'system',
+    job_id: null,
+    is_read: true,
+    created_at: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
+  }
+];
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
@@ -80,9 +120,22 @@ export function AuthProvider({ children }) {
     ];
   });
 
+  const [notifications, setNotifications] = useState(() => {
+    const saved = localStorage.getItem('jobcurrent_notifications');
+    return saved ? JSON.parse(saved) : DEFAULT_NOTIFICATIONS;
+  });
+
+  const unreadCount = useMemo(() => {
+    return notifications.filter(n => !n.is_read).length;
+  }, [notifications]);
+
   const [loading, setLoading] = useState(false);
 
   // Sync to localStorage
+  useEffect(() => {
+    localStorage.setItem('jobcurrent_notifications', JSON.stringify(notifications));
+  }, [notifications]);
+
   useEffect(() => {
     if (user) localStorage.setItem('jobcurrent_auth_user', JSON.stringify(user));
     else localStorage.removeItem('jobcurrent_auth_user');
@@ -208,6 +261,30 @@ export function AuthProvider({ children }) {
 
   const isJobSaved = (jobId) => savedJobIds.includes(jobId);
 
+  const markNotificationAsRead = (id) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+  };
+
+  const markAllNotificationsAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+  };
+
+  const deleteNotification = (id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+
+  const addNotification = (notif) => {
+    setNotifications(prev => [
+      {
+        id: 'notif-' + Date.now(),
+        created_at: new Date().toISOString(),
+        is_read: false,
+        ...notif
+      },
+      ...prev
+    ]);
+  };
+
   const updateApplicationStatus = (jobId, newStatus, notes = '') => {
     setApplications(prev => {
       const existingIndex = prev.findIndex(a => a.job_id === jobId);
@@ -243,6 +320,12 @@ export function AuthProvider({ children }) {
         preferences,
         savedJobIds,
         applications,
+        notifications,
+        unreadCount,
+        markNotificationAsRead,
+        markAllNotificationsAsRead,
+        deleteNotification,
+        addNotification,
         profileCompletion,
         loading,
         isSupabaseConfigured,

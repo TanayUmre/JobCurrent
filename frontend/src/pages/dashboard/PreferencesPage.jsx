@@ -35,7 +35,8 @@ export function PreferencesPage() {
   const [includeUnknown, setIncludeUnknown] = useState(preferences?.include_unknown_eligibility ?? true);
   
   // Notification settings
-  const [emailEnabled, setEmailEnabled] = useState(preferences?.email_enabled ?? true);
+  const [inAppEnabled, setInAppEnabled] = useState(preferences?.in_app_notifications_enabled ?? true);
+  const [emailEnabled, setEmailEnabled] = useState(preferences?.email_enabled ?? false);
   const [frequency, setFrequency] = useState(preferences?.notification_frequency || 'daily');
   const [notifTime, setNotifTime] = useState(preferences?.notification_time || '08:00');
   const [timezone, setTimezone] = useState(preferences?.timezone || 'Asia/Kolkata');
@@ -72,6 +73,7 @@ export function PreferencesPage() {
       minimum_stipend: Number(minStipend),
       paid_only: paidOnly,
       include_unknown_eligibility: includeUnknown,
+      in_app_notifications_enabled: inAppEnabled,
       email_enabled: emailEnabled,
       notification_frequency: frequency,
       notification_time: notifTime,
@@ -220,67 +222,86 @@ export function PreferencesPage() {
           </div>
         </div>
 
-        {/* Section 3: Daily Email Digest Configuration */}
+        {/* Section 3: Notification & Daily Alert Center */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-6 shadow-card space-y-5">
           <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-1.5">
             <BellRing className="w-4 h-4 text-brand-600" />
-            Email Notification Digest
+            Daily Alerts & Notification Center
           </h2>
 
-          <label className="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-800 dark:text-slate-200">
-            <input
-              type="checkbox"
-              checked={emailEnabled}
-              onChange={(e) => setEmailEnabled(e.target.checked)}
-              className="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4"
-            />
-            Send me personalized email digests with new matching jobs
-          </label>
+          {/* In-App Notifications (Option 1) */}
+          <div className="p-4 rounded-xl bg-brand-50/50 dark:bg-brand-950/30 border border-brand-200/60 dark:border-brand-800/60 space-y-2">
+            <label className="flex items-center gap-2.5 cursor-pointer text-xs font-bold text-slate-900 dark:text-white">
+              <input
+                type="checkbox"
+                checked={inAppEnabled}
+                onChange={(e) => setInAppEnabled(e.target.checked)}
+                className="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4"
+              />
+              In-App Daily Alert Center (Recommended — 100% Free & Zero Spam)
+            </label>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 pl-6.5 leading-relaxed">
+              Receive direct notification bell alerts and dashboard banners whenever newly discovered opportunities match your skills and academic criteria. No email setup required.
+            </p>
+          </div>
 
-          {emailEnabled && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-              <div className="space-y-1.5 text-left">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-                  Digest Frequency
-                </label>
-                <select
-                  value={frequency}
-                  onChange={(e) => setFrequency(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs text-slate-800 dark:text-slate-200"
-                >
-                  <option value="daily">Daily Digest (Recommended)</option>
-                  <option value="weekly">Weekly Summary</option>
-                </select>
-              </div>
+          {/* Optional External Email Digest */}
+          <div className="space-y-3 pt-2">
+            <label className="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-800 dark:text-slate-200">
+              <input
+                type="checkbox"
+                checked={emailEnabled}
+                onChange={(e) => setEmailEnabled(e.target.checked)}
+                className="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4"
+              />
+              Also send me email digests (Optional)
+            </label>
 
-              <div className="space-y-1.5 text-left">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-                  Delivery Time
-                </label>
-                <input
-                  type="time"
-                  value={notifTime}
-                  onChange={(e) => setNotifTime(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs text-slate-800 dark:text-slate-200"
-                />
-              </div>
+            {emailEnabled && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <div className="space-y-1.5 text-left">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                    Digest Frequency
+                  </label>
+                  <select
+                    value={frequency}
+                    onChange={(e) => setFrequency(e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs text-slate-800 dark:text-slate-200"
+                  >
+                    <option value="daily">Daily Digest (Recommended)</option>
+                    <option value="weekly">Weekly Summary</option>
+                  </select>
+                </div>
 
-              <div className="space-y-1.5 text-left">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-                  Timezone
-                </label>
-                <select
-                  value={timezone}
-                  onChange={(e) => setTimezone(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs text-slate-800 dark:text-slate-200"
-                >
-                  <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
-                  <option value="UTC">UTC</option>
-                  <option value="America/New_York">US Eastern (EST)</option>
-                </select>
+                <div className="space-y-1.5 text-left">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                    Delivery Time
+                  </label>
+                  <input
+                    type="time"
+                    value={notifTime}
+                    onChange={(e) => setNotifTime(e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs text-slate-800 dark:text-slate-200"
+                  />
+                </div>
+
+                <div className="space-y-1.5 text-left">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                    Timezone
+                  </label>
+                  <select
+                    value={timezone}
+                    onChange={(e) => setTimezone(e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs text-slate-800 dark:text-slate-200"
+                  >
+                    <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                    <option value="UTC">UTC</option>
+                    <option value="America/New_York">US Eastern (EST)</option>
+                  </select>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Submit */}

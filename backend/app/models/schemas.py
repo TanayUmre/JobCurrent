@@ -131,6 +131,26 @@ class ExtractionResponse(BaseModel):
 
 
 # ==========================================
+# In-App Notification Schemas
+# ==========================================
+class InAppNotification(BaseModel):
+    id: str
+    user_id: Optional[str] = None
+    title: str
+    message: str
+    type: Literal["match", "deadline", "application", "system"] = "match"
+    job_id: Optional[str] = None
+    data: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    is_read: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class NotificationListResponse(BaseModel):
+    notifications: List[InAppNotification]
+    unread_count: int
+
+
+# ==========================================
 # Email Digest Schemas
 # ==========================================
 class DigestRequest(BaseModel):

@@ -14,14 +14,26 @@ import {
   AlertTriangle,
   Briefcase,
   Sliders,
-  TrendingUp
+  TrendingUp,
+  Bell,
+  ExternalLink
 } from 'lucide-react';
 import { Button } from '../../components/common/Button';
 import { Badge } from '../../components/common/Badge';
 import { calculateMatchScore, checkEligibility, formatDeadline } from '../../lib/utils';
 
 export function DashboardPage() {
-  const { user, profile, preferences, profileCompletion, savedJobIds, applications } = useAuth();
+  const { 
+    user, 
+    profile, 
+    preferences, 
+    profileCompletion, 
+    savedJobIds, 
+    applications,
+    notifications,
+    unreadCount,
+    markNotificationAsRead
+  } = useAuth();
 
   // Calculate recommendation matches
   const recommendedJobs = MOCK_JOBS.map(job => {
@@ -222,19 +234,70 @@ export function DashboardPage() {
             </div>
           </div>
 
-          {/* Email Digest Settings Widget */}
-          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-card space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              Daily Email Digest
-            </h3>
+          {/* In-App Daily Alert Center */}
+          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-card space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-1.5">
+                <Bell className="w-4 h-4 text-brand-600" />
+                In-App Daily Alerts
+              </h3>
+              {unreadCount > 0 ? (
+                <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-brand-50 text-brand-600 dark:bg-brand-950 dark:text-brand-400 border border-brand-200/60 dark:border-brand-800">
+                  {unreadCount} New
+                </span>
+              ) : (
+                <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" /> All caught up
+                </span>
+              )}
+            </div>
+
             <p className="text-xs text-slate-500 leading-relaxed">
-              Automated notifications are scheduled every morning at 08:00 AM IST with newly discovered opportunities.
+              Real-time alerts for opportunities matching your academic qualifications and skills.
             </p>
+
+            {/* List of Latest 3 In-App Alerts */}
+            <div className="space-y-2.5">
+              {notifications && notifications.length > 0 ? (
+                notifications.slice(0, 3).map((notif) => (
+                  <div 
+                    key={notif.id}
+                    className={`p-3 rounded-xl border transition text-left ${
+                      !notif.is_read 
+                        ? 'border-brand-200 bg-brand-50/40 dark:border-brand-900/60 dark:bg-brand-950/20' 
+                        : 'border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/30'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className={`text-xs ${!notif.is_read ? 'font-bold text-slate-900 dark:text-white' : 'font-medium text-slate-700 dark:text-slate-300'} truncate`}>
+                        {notif.title}
+                      </p>
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-1 leading-relaxed">
+                      {notif.message}
+                    </p>
+                    {notif.job_id && (
+                      <Link 
+                        to={`/jobs/${notif.job_id}`}
+                        onClick={() => markNotificationAsRead(notif.id)}
+                        className="inline-flex items-center gap-1 text-[10px] text-brand-600 dark:text-brand-400 font-semibold mt-2 hover:underline"
+                      >
+                        Inspect Opportunity <ExternalLink className="w-2.5 h-2.5" />
+                      </Link>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="py-4 text-center text-xs text-slate-400">
+                  No alerts currently pending.
+                </div>
+              )}
+            </div>
+
             <div className="pt-2">
               <Link to="/dashboard/preferences">
                 <Button variant="outline" size="sm" className="w-full text-xs">
-                  Notification Preferences
+                  Notification & Alert Preferences
                 </Button>
               </Link>
             </div>
