@@ -1,3 +1,4 @@
+import pytest
 import asyncio
 from app.connectors.jobvetta import JobvettaConnector
 from app.connectors.himalayas import HimalayasConnector
@@ -20,9 +21,10 @@ def test_get_active_connectors_count_and_names():
     assert "Lever Direct API" in names
 
 
-def test_jobvetta_connector_fallback_and_normalization():
+@pytest.mark.asyncio
+async def test_jobvetta_connector_fallback_and_normalization():
     connector = JobvettaConnector(config={"api_key": ""})
-    raw_jobs = asyncio.run(connector.fetch_raw_jobs())
+    raw_jobs = await connector.fetch_raw_jobs()
     assert len(raw_jobs) >= 5
 
     sample = raw_jobs[0]

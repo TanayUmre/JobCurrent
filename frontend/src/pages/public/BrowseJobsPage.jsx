@@ -46,7 +46,19 @@ export function BrowseJobsPage() {
             .order('posted_at', { ascending: false });
 
           if (!error && data && data.length > 0) {
-            setAllListings(data);
+            const indianTerms = [
+              'india', 'bengaluru', 'bangalore', 'hyderabad', 'pune', 'mumbai',
+              'delhi', 'ncr', 'gurgaon', 'gurugram', 'noida', 'chennai', 'kolkata',
+              'ahmedabad', 'kochi', 'coimbatore', 'jaipur', 'chandigarh', 'indore'
+            ];
+            const indiaJobs = data.filter(j => {
+              if (j.currency === 'INR') return true;
+              const loc = (j.location || '').toLowerCase();
+              return indianTerms.some(term => loc.includes(term));
+            });
+            if (indiaJobs.length > 0) {
+              setAllListings(indiaJobs);
+            }
           }
         } catch (e) {
           console.warn('[BrowseJobs] Fallback to verified catalog:', e.message);

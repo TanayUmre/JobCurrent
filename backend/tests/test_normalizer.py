@@ -28,3 +28,21 @@ def test_duplicate_filtering():
     unique, duplicates = NormalizerService.filter_duplicates(processed)
     assert len(unique) == 2
     assert len(duplicates) == 1
+
+
+def test_is_india_eligible():
+    # Valid Indian opportunities
+    assert NormalizerService.is_india_eligible({"location": "Bengaluru, Karnataka, India"}) is True
+    assert NormalizerService.is_india_eligible({"location": "Hyderabad, Telangana"}) is True
+    assert NormalizerService.is_india_eligible({"location": "Pune, Maharashtra"}) is True
+    assert NormalizerService.is_india_eligible({"location": "Gurgaon, Haryana"}) is True
+    assert NormalizerService.is_india_eligible({"location": "Noida / Delhi NCR"}) is True
+    assert NormalizerService.is_india_eligible({"location": "Remote", "currency": "INR"}) is True
+    assert NormalizerService.is_india_eligible({"title": "SDE Intern (India Remote)", "location": "Remote"}) is True
+
+    # Excluded foreign opportunities
+    assert NormalizerService.is_india_eligible({"location": "Berlin, Germany", "currency": "EUR"}) is False
+    assert NormalizerService.is_india_eligible({"location": "London, United Kingdom", "currency": "GBP"}) is False
+    assert NormalizerService.is_india_eligible({"location": "San Francisco, CA, USA", "currency": "USD"}) is False
+    assert NormalizerService.is_india_eligible({"location": "Toronto, Canada", "currency": "CAD"}) is False
+    assert NormalizerService.is_india_eligible({"location": "Sydney, Australia", "currency": "AUD"}) is False

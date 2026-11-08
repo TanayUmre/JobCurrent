@@ -57,7 +57,7 @@ async def main():
                     "salary_min": j.get("salary_min"),
                     "salary_max": j.get("salary_max"),
                     "stipend": j.get("stipend"),
-                    "currency": j.get("currency", "USD"),
+                    "currency": j.get("currency") or "INR",
                     "paid_status": j.get("paid_status", "paid"),
                     "required_skills": j.get("required_skills", []),
                     "minimum_cgpa": j.get("minimum_cgpa"),

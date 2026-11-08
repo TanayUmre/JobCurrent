@@ -65,6 +65,59 @@ class NormalizerService:
             return "hybrid"
         return "onsite"
 
+    INDIAN_GEO_TERMS = {
+        "india", "bengaluru", "bangalore", "hyderabad", "secunderabad", "pune", "mumbai", 
+        "navi mumbai", "thane", "delhi", "new delhi", "ncr", "delhi ncr", "gurgaon", 
+        "gurugram", "noida", "greater noida", "chennai", "kolkata", "ahmedabad", 
+        "gandhinagar", "kochi", "cochin", "trivandrum", "thiruvananthapuram", "coimbatore", 
+        "jaipur", "chandigarh", "mohali", "indore", "mysore", "mysuru", "bhubaneswar", 
+        "nagpur", "surat", "vadodara", "visakhapatnam", "vizag", "karnataka", "telangana", 
+        "maharashtra", "tamil nadu", "kerala", "gujarat", "haryana", "uttar pradesh", 
+        "west bengal", "punjab", "rajasthan", "andhra pradesh", "odisha", "madhya pradesh"
+    }
+
+    FOREIGN_RESTRICTION_TERMS = {
+        "united states", "usa", "us only", "u.s.", "canada", "germany", "berlin",
+        "munich", "frankfurt", "united kingdom", "uk only", "london", "manchester",
+        "france", "paris", "australia", "sydney", "melbourne", "netherlands", "amsterdam",
+        "spain", "madrid", "barcelona", "switzerland", "zurich", "austria", "vienna",
+        "ireland", "dublin", "brazil", "japan", "tokyo", "singapore", "europe only",
+        "latin america", "emea", "apac"
+    }
+
+    @classmethod
+    def is_india_eligible(cls, job: Dict[str, Any]) -> bool:
+        """
+        Enforces strict India-only filtering.
+        Ensures opportunity is located in India (Bengaluru, Hyderabad, Pune, Mumbai,
+        Delhi/NCR, etc.) or is an India-based remote listing.
+        Excludes foreign countries (USA, UK, Germany, Canada, Australia, Europe, etc.).
+        """
+        loc = (job.get("location") or "").lower()
+        title = (job.get("title") or "").lower()
+        currency = (job.get("currency") or "").upper()
+
+        # If foreign country/city is mentioned in location, exclude (unless India is also explicitly stated)
+        is_foreign = any(re.search(rf"\b{re.escape(term)}\b", loc) for term in cls.FOREIGN_RESTRICTION_TERMS)
+        has_india_mention = any(re.search(rf"\b{re.escape(term)}\b", loc) for term in cls.INDIAN_GEO_TERMS) or \
+                             any(re.search(rf"\b{re.escape(term)}\b", title) for term in cls.INDIAN_GEO_TERMS)
+
+        if is_foreign and not has_india_mention:
+            return False
+
+        if currency == "INR":
+            return True
+
+        # Check for explicit Indian locations in location or title
+        if has_india_mention:
+            return True
+
+        # Remote India variations
+        if "remote" in loc and "india" in loc:
+            return True
+
+        return False
+
     @classmethod
     def process_job(cls, raw_job: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -82,6 +135,9 @@ class NormalizerService:
         cleaned_skills = list(dict.fromkeys([s.strip() for s in raw_skills if s and s.strip()]))
 
         job_copy = dict(raw_job)
+        if not job_copy.get("currency"):
+            job_copy["currency"] = "INR"
+
         job_copy.update({
             "company_name": company,
             "original_url": original_url,
@@ -104,6 +160,10 @@ class NormalizerService:
         duplicates = []
 
         for job in incoming_jobs:
+            # Exclude jobs that are restricted to foreign countries
+            if not cls.is_india_eligible(job):
+                continue
+
             h = job.get("description_hash")
             if h and h in seen:
                 duplicates.append(job)

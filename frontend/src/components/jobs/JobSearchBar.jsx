@@ -31,11 +31,26 @@ export function JobSearchBar({
         <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
         <input
           type="text"
+          list="indian-cities-list"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          placeholder="City, region, or 'Remote'..."
+          placeholder="Bengaluru, Pune, Remote..."
           className="w-full pl-10 pr-4 py-2 text-sm bg-transparent border-0 focus:ring-0 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none"
         />
+        <datalist id="indian-cities-list">
+          <option value="Bengaluru, Karnataka" />
+          <option value="Hyderabad, Telangana" />
+          <option value="Pune, Maharashtra" />
+          <option value="Mumbai, Maharashtra" />
+          <option value="Delhi / NCR" />
+          <option value="Gurgaon, Haryana" />
+          <option value="Noida, Uttar Pradesh" />
+          <option value="Chennai, Tamil Nadu" />
+          <option value="Kolkata, West Bengal" />
+          <option value="Ahmedabad, Gujarat" />
+          <option value="Kochi, Kerala" />
+          <option value="Remote (India)" />
+        </datalist>
       </div>
 
       <div className="hidden md:block w-px h-6 bg-slate-200 dark:bg-slate-800" />
