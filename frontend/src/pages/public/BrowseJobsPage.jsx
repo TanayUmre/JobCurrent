@@ -7,6 +7,7 @@ import { EmptyState } from '../../components/common/EmptyState';
 import { Button } from '../../components/common/Button';
 import { Badge } from '../../components/common/Badge';
 import { MOCK_JOBS } from '../../data/mockJobs';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { 
   Briefcase, 
   RefreshCw, 
@@ -17,7 +18,7 @@ import {
   X
 } from 'lucide-react';
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 12;
 
 export function BrowseJobsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -26,11 +27,34 @@ export function BrowseJobsPage() {
   const initialMode = searchParams.get('mode') || 'all';
   const initialDomain = searchParams.get('domain') || 'all';
 
+  const [allListings, setAllListings] = useState(MOCK_JOBS);
   const [query, setQuery] = useState(initialSearch);
   const [location, setLocation] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Sync with Supabase PostgreSQL jobs if available
+  useEffect(() => {
+    async function loadJobsFromDatabase() {
+      if (isSupabaseConfigured) {
+        try {
+          const { data, error } = await supabase
+            .from('jobs')
+            .select('*')
+            .eq('status', 'active')
+            .order('posted_at', { ascending: false });
+
+          if (!error && data && data.length > 0) {
+            setAllListings(data);
+          }
+        } catch (e) {
+          console.warn('[BrowseJobs] Fallback to verified catalog:', e.message);
+        }
+      }
+    }
+    loadJobsFromDatabase();
+  }, []);
 
   const [filters, setFilters] = useState({
     jobType: initialType,
@@ -64,7 +88,7 @@ export function BrowseJobsPage() {
 
   // Filter and sort listings
   const filteredJobs = useMemo(() => {
-    return MOCK_JOBS.filter(job => {
+    return allListings.filter(job => {
       // 1. Text Query
       if (query) {
         const q = query.toLowerCase();

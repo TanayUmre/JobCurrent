@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { MOCK_JOBS } from '../../data/mockJobs';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { 
   Building2, 
   MapPin, 
@@ -36,7 +37,28 @@ export function JobDetailsPage() {
   const [copied, setCopied] = useState(false);
 
   // Find job from mock or centralized repository
-  const job = MOCK_JOBS.find(j => j.id === id);
+  const [job, setJob] = useState(() => {
+    return MOCK_JOBS.find(j => j.id === id || String(j.source_job_id).toLowerCase() === String(id).toLowerCase());
+  });
+
+  // Also query Supabase if not found locally
+  useEffect(() => {
+    async function fetchFromDatabase() {
+      if (!job && id && isSupabaseConfigured) {
+        try {
+          const { data } = await supabase
+            .from('jobs')
+            .select('*')
+            .or(`id.eq.${id},source_job_id.eq.${id}`)
+            .single();
+          if (data) setJob(data);
+        } catch (e) {
+          // ignore
+        }
+      }
+    }
+    fetchFromDatabase();
+  }, [id, job]);
 
   if (!job) {
     return (
