@@ -85,19 +85,21 @@ export function JobDetailsPage() {
   // Existing application record
   const existingApp = applications.find(a => a.job_id === job.id);
 
+  const applyUrl = job.application_url?.trim() || 
+                   job.original_url?.trim() || 
+                   job.url?.trim() || 
+                   `https://www.google.com/search?q=${encodeURIComponent(job.company_name + ' ' + job.title + ' careers')}`;
+
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleApplyNow = () => {
-    if (job.application_url) {
-      // Record application tracker status if logged in
-      if (user && !existingApp) {
-        updateApplicationStatus(job.id, 'applied', `Applied via ${job.source_name}`);
-      }
-      window.open(job.application_url, '_blank', 'noopener,noreferrer');
+  const handleApplyClick = () => {
+    // Record application tracker status if logged in
+    if (user && !existingApp) {
+      updateApplicationStatus(job.id, 'applied', `Applied via ${job.source_name}`);
     }
   };
 
@@ -173,16 +175,18 @@ export function JobDetailsPage() {
               {saved ? "Saved" : "Save"}
             </Button>
 
-            <Button
-              variant="primary"
-              size="md"
-              onClick={handleApplyNow}
-              className="flex-1 sm:flex-initial"
-              disabled={deadlineInfo.isExpired}
+            <a
+              href={applyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleApplyClick}
+              className={`inline-flex items-center justify-center font-semibold transition-all duration-150 rounded-xl text-sm px-5 py-2.5 gap-2 bg-brand-600 hover:bg-brand-700 text-white shadow-sm focus:ring-2 focus:ring-brand-500 focus:outline-none flex-1 sm:flex-initial select-none ${
+                deadlineInfo.isExpired ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''
+              }`}
             >
               {deadlineInfo.isExpired ? "Closed" : "Apply Now"}
               <ExternalLink className="w-4 h-4 ml-1.5" />
-            </Button>
+            </a>
           </div>
         </div>
 
@@ -254,6 +258,28 @@ export function JobDetailsPage() {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Direct Apply Card */}
+            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-50 dark:bg-slate-800/40 p-4 sm:p-5 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+              <div className="space-y-0.5">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Ready to apply to {job.company_name}?
+                </h4>
+                <p className="text-xs text-slate-500">
+                  Click below to open the official careers portal and submit your application.
+                </p>
+              </div>
+              <a
+                href={applyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleApplyClick}
+                className="inline-flex items-center justify-center font-semibold text-xs px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white shadow-sm gap-1.5 shrink-0 transition"
+              >
+                Apply on Company Site
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
             </div>
           </div>
         </div>

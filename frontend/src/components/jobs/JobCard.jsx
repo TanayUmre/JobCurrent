@@ -26,8 +26,14 @@ import {
 } from '../../lib/utils';
 
 export function JobCard({ job, showEligibility = true }) {
-  const { user, profile, preferences, isJobSaved, toggleSaveJob } = useAuth();
+  const { user, profile, preferences, isJobSaved, toggleSaveJob, updateApplicationStatus, applications = [] } = useAuth();
   const saved = isJobSaved(job.id);
+  const existingApp = (applications || []).find(a => a.job_id === job.id);
+
+  const applyUrl = job.application_url?.trim() || 
+                   job.original_url?.trim() || 
+                   job.url?.trim() || 
+                   `https://www.google.com/search?q=${encodeURIComponent(job.company_name + ' ' + job.title + ' careers')}`;
 
   const deadlineInfo = formatDeadline(job.application_deadline);
   const salaryString = formatSalaryRange(
@@ -197,13 +203,30 @@ export function JobCard({ job, showEligibility = true }) {
             </p>
           </div>
 
-          {/* Action Button */}
-          <Link to={`/jobs/${job.id}`}>
-            <Button variant="outline" size="sm" className="group-hover:bg-brand-50 group-hover:border-brand-200 group-hover:text-brand-700 dark:group-hover:bg-brand-950/40">
-              Details
-              <ArrowRight className="w-3.5 h-3.5 ml-1 transition-transform group-hover:translate-x-0.5" />
-            </Button>
-          </Link>
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2">
+            <Link to={`/jobs/${job.id}`}>
+              <Button variant="outline" size="sm" className="group-hover:bg-brand-50 group-hover:border-brand-200 group-hover:text-brand-700 dark:group-hover:bg-brand-950/40">
+                Details
+              </Button>
+            </Link>
+            <a
+              href={applyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (user && !existingApp) {
+                  updateApplicationStatus(job.id, 'applied', `Applied via ${job.source_name}`);
+                }
+              }}
+              className="inline-flex items-center justify-center font-semibold text-xs px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white shadow-sm gap-1 transition shrink-0"
+              title={`Apply directly on ${job.company_name}`}
+            >
+              Apply
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
         </div>
       </div>
     </div>
