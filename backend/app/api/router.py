@@ -5,6 +5,7 @@ from app.api.v1.collector import router as collector_router
 from app.api.v1.extraction import router as extraction_router
 from app.api.v1.digest import router as digest_router
 from app.api.v1.notifications import router as notifications_router
+from app.api.v1.admin import router as admin_router
 
 api_router = APIRouter()
 api_router.include_router(jobs_router)
@@ -13,3 +14,4 @@ api_router.include_router(collector_router)
 api_router.include_router(extraction_router)
 api_router.include_router(digest_router)
 api_router.include_router(notifications_router)
+api_router.include_router(admin_router)

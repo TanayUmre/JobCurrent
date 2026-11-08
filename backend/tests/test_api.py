@@ -3,6 +3,7 @@ from app.api.v1.jobs import list_jobs, get_job_by_id
 from app.api.v1.matching import evaluate_match
 from app.api.v1.collector import get_collector_status
 from app.api.v1.notifications import get_notifications, mark_notification_read, mark_all_notifications_read
+from app.api.v1.admin import get_admin_stats
 from app.models.schemas import MatchEvaluationRequest, JobBase, CandidateProfile
 
 
@@ -66,3 +67,11 @@ def test_in_app_notifications_endpoints():
 
     all_read = mark_all_notifications_read()
     assert all_read["success"] is True
+
+
+def test_admin_stats_endpoint():
+    stats = get_admin_stats()
+    assert stats["status"] == "operational"
+    assert stats["active_jobs_count"] >= 1
+    assert len(stats["sources"]) == 6
+    assert len(stats["recent_logs"]) >= 1
